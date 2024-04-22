@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+    <div id="top">
+    <form id="search-form" method="POST">
+        <input type="text" name="query" id="searchbar" placeholder="Enter Product Name">
+        <button type="submit">Search</button>
+    </form>
+    <form action="/cart" id="cart-form">
+        <button type="submit">Cart</button>
+    </form>
+    </div>
+    {% if product_info %}
+        <h2>Amazon Results:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Link</th>
+                    <th>Add to Cart</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in product_info %}
+                    <tr>
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.price }}</td>
+                        <td><a href="{{ item.url }}" target="_blank">View on Amazon</a></td>
+                        <td><button onclick="addToCart('{{ item.title }}', '{{ item.price }}', '{{ item.url }}')">Add</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No results found on Amazon.</p>
+    {% endif %}
+
+<script>
+    // Wait for the DOM content to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find the cart button element
+        var cartBtn = document.getElementById('cart-btn');
+
+        // Add a click event listener to the cart button
+        cartBtn.addEventListener('click', function() {
+            // Redirect to the cart page
+            window.location.href = '/cart';
+        });
+    });
+    function addToCart(title, price, url) {
+        // Send a POST request to the server to add the item to the cart
+        fetch('/add_to_cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: title,
+                price: price,
+                url: url
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Display an alert message indicating that the item has been added to the cart
+            alert(data.message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+
+{% endblock %}

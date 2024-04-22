@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <style>
+        table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius:10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+    </style>
+</head>
+<body>
+    <div id="cart">
+        <h2>Shopping Cart</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Link</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.price }}</td>
+                        <td><a href="{{ item.url }}" target="_blank">View on Amazon</a></td>
+                        <td><button onclick="removeFromCart('{{ item.id }}')">Remove</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+<script>
+    function removeFromCart(itemId) {
+        // Remove the item from the page immediately
+        var itemToRemove = document.getElementById('item-' + itemId);
+        if (itemToRemove) {
+            itemToRemove.remove();
+        }
+
+        // Send a POST request to the server to remove the item from the cart
+        fetch('/remove_from_cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: itemId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Display an alert message indicating that the item has been removed
+            alert(data.message);
+            // Reload the page
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+
+
+
+</body>
+</html>
